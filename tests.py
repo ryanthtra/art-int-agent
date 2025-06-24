@@ -1,4 +1,4 @@
-from functions.get_files_info import get_files_info, get_file_content, write_file
+from functions.get_files_info import get_files_info, get_file_content, write_file, run_python_file
 
 # print(f"{get_files_info("calculator", ".")}")
 # print(f"{get_files_info("calculator", "pkg")}")
@@ -10,6 +10,11 @@ from functions.get_files_info import get_files_info, get_file_content, write_fil
 # print(f"{get_file_content("calculator", "pkg/calculator.py")}")
 # print(f"{get_file_content("calculator", "/bin/cat")}")
 
-print(f"{write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum")}")
-print(f"{write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet")}")
-print(f"{write_file("calculator", "/tmp/temp.txt", "this should not be allowed")}")
+# print(f"{write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum")}")
+# print(f"{write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet")}")
+# print(f"{write_file("calculator", "/tmp/temp.txt", "this should not be allowed")}")
+
+print(f"{run_python_file("calculator", "main.py")}")
+print(f"{run_python_file("calculator", "tests.py")}")
+print(f"{run_python_file("calculator", "../main.py")}") #(this should return an error
+print(f"{run_python_file("calculator", "nonexistent.py")}") #(this should return an error)

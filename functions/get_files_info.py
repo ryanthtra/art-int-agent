@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 MAX_CHARS = 10000
 
@@ -82,7 +83,7 @@ def write_file(working_directory, file_path, content):
                 curr_dir = f"{curr_dir}/{file_path_arr[i]}"
                 if os.path.isdir(curr_dir): # is an existing folder           
                     continue
-                else: # is a file, so overwrite                         
+                else: # is a file, so overwrite
                     with open(curr_dir, "w") as f:
                         f.write(content)
                         return f'Successfully wrote to "{file_path_arr[i]}" ({len(content)} characters written)'
@@ -103,4 +104,43 @@ def write_file(working_directory, file_path, content):
         except Exception as e:
             return f"Error trying to create a file: {e}"
 
-    
+
+def run_python_file(working_directory, file_path):
+
+    file_path_arr = list(file_path.split('/'))
+    curr_dir = working_directory
+    for i in range(0, len(file_path_arr)):
+        try:
+            # First, see if current path is part of current directory path            
+            if file_path_arr[i] in os.listdir(curr_dir):
+                curr_dir = f"{curr_dir}/{file_path_arr[i]}"
+                if os.path.isdir(curr_dir): # is an existing folder           
+                    continue
+                else: # is an existing file
+                    # See if file is a python file
+                    item_name_arr = file_path_arr[i].split('.')
+                    if item_name_arr[-1] != "py":
+                        return f'Error: "{file_path}" is not a Python file.'
+                    else:
+                        try:
+                            # subprocess.run(args, *, stdin=None, input=None, stdout=None, stderr=None, capture_output=False, shell=False, cwd=None, timeout=None, check=False, encoding=None, errors=None, text=None, env=None, universal_newlines=None, **other_popen_kwargs)
+                            processed_obj = subprocess.run(["python3", f"{curr_dir}"], timeout=30, capture_output=True)
+                            if processed_obj.returncode != 0:
+                                return f"Process exited with code {processed_obj.returncode}"
+                            elif len(processed_obj.stdout) == 0 and len(processed_obj.stderr) == 0:
+                                return "No output produced."
+                            else:
+                                content = f"STDOUT: {processed_obj.stdout} \nSTDERR: {processed_obj.stderr}\n"
+                                f"{write_file(working_directory, f"{item_name_arr[0]}_output.txt", content)}"
+                                return "Ran"
+                        except Exception as e:
+                            f"Error: executing Python file: {e}"
+            else:
+                # See is if the unfound item is a directory or a file
+                item_name_arr = file_path_arr[i].split('.')
+                if len(item_name_arr) == 1 or file_path_arr[i] == "..": # is directory
+                    return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
+                else:
+                    return f'Error: File "{file_path}" not found.'
+        except Exception as e:
+            return f"Error trying to create a file: {e}"
